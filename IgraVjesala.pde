@@ -1,5 +1,6 @@
 int mainMenu = 0;
-String[] opcije = {"Singleplayer", "Multiplayer", "Leveli", "Postavke", "Izlaz"};
+String[] opcije = {"Singleplayer", "Multiplayer", "Postavke", "Izlaz"};
+String[] singleplayerOpcije = {"Level", "Natrag"};
 
 void setup() {
   size(600, 400);
