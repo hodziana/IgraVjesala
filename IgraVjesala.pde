@@ -1,4 +1,4 @@
-int mainMenu = 0;
+int mainMenu = -1;
 int hoverIndex = -1;
 String[] opcije = {"Singleplayer", "Multiplayer", "Postavke", "Izlaz"};
 String[] singleplayerOpcije = {"Leveli", "Natrag"};
@@ -6,6 +6,8 @@ String[] levelOpcije = {"Level 1", "Level 2", "Level 3", "Natrag"};
 boolean singleplayerMenu = false;
 boolean levelMenu = false;
 boolean igraAktivna = false;
+boolean prikaziRezultat = false;
+boolean pobjeda = false;
 
 int odabraniLevel = 1;
 String rijec = "";
@@ -27,7 +29,9 @@ void draw() {
   background(200, 220, 255);
   hoverIndex = -1;
 
-  if (igraAktivna) {
+  if (prikaziRezultat) {
+    prikaziRezultatEkran();
+  } else if (igraAktivna) {
     prikaziIgru();
   } else if (levelMenu) {
     prikaziOpcije(levelOpcije);
@@ -38,6 +42,14 @@ void draw() {
   }
 }
 
+void prikaziRezultatEkran() {
+  fill(pobjeda ? color(0, 150, 0) : color(255, 0, 0));
+  text(pobjeda ? "Pobijedio si!" : "Izgubio si!", width / 2, 60);
+
+  String[] rezultatOpcije = {"Natrag na level menu"};
+  prikaziOpcije(rezultatOpcije);
+}
+
 void prikaziOpcije(String[] izbornik) {
   for (int i = 0; i < izbornik.length; i++) {
     float x = width / 2;
@@ -45,7 +57,8 @@ void prikaziOpcije(String[] izbornik) {
     float w = textWidth(izbornik[i]);
     float h = 32;
 
-    boolean isHovered = mouseX > x - w/2 && mouseX < x + w/2 && mouseY > y - h/2 && mouseY < y + h/2;
+    boolean isHovered = mouseX > x - w / 2 && mouseX < x + w / 2 &&
+                        mouseY > y - h / 2 && mouseY < y + h / 2;
     if (isHovered) hoverIndex = i;
   }
 
@@ -82,19 +95,15 @@ void prikaziIgru() {
   text("Level: " + odabraniLevel, width / 2, 320);
 
   if (pokusaji <= 0) {
-    fill(255, 0, 0);
-    text("Izgubio si!", width / 2, height - 50);
-    delay(1500);
+    prikaziRezultat = true;
+    pobjeda = false;
     igraAktivna = false;
-    levelMenu = true;
-    mainMenu = 0;
+    mainMenu = -1;
   } else if (svePogodeno) {
-    fill(0, 150, 0);
-    text("Pobijedio si!", width / 2, height - 50);
-    delay(1500);
+    prikaziRezultat = true;
+    pobjeda = true;
     igraAktivna = false;
-    levelMenu = true;
-    mainMenu = 0;
+    mainMenu = -1;
   }
 }
 
@@ -112,7 +121,7 @@ void keyPressed() {
       mainMenu = 0;
     }
   } else {
-    String[] trenutniMeni = levelMenu ? levelOpcije : (singleplayerMenu ? singleplayerOpcije : opcije);
+    String[] trenutniMeni = prikaziRezultat ? new String[]{"Natrag na level menu"} : levelMenu ? levelOpcije : (singleplayerMenu ? singleplayerOpcije : opcije);
     int duljina = trenutniMeni.length;
     if (keyCode == UP) {
       mainMenu = (mainMenu - 1 + duljina) % duljina;
@@ -125,13 +134,14 @@ void keyPressed() {
 }
 
 void mousePressed() {
-  String[] trenutniMeni = levelMenu ? levelOpcije : (singleplayerMenu ? singleplayerOpcije : opcije);
+  String[] trenutniMeni = prikaziRezultat ? new String[]{"Natrag na level menu"} : levelMenu ? levelOpcije : (singleplayerMenu ? singleplayerOpcije : opcije);
   for (int i = 0; i < trenutniMeni.length; i++) {
     float x = width / 2;
     float y = 100 + i * 50;
     float w = textWidth(trenutniMeni[i]);
     float h = 32;
-    if (mouseX > x - w/2 && mouseX < x + w/2 && mouseY > y - h/2 && mouseY < y + h/2) {
+    if (mouseX > x - w / 2 && mouseX < x + w / 2 &&
+        mouseY > y - h / 2 && mouseY < y + h / 2) {
       mainMenu = i;
       odaberiTrenutno();
     }
@@ -141,7 +151,11 @@ void mousePressed() {
 void odaberiTrenutno() {
   if (igraAktivna) return;
 
-  if (levelMenu) {
+  if (prikaziRezultat) {
+    prikaziRezultat = false;
+    levelMenu = true;
+    mainMenu = -1;
+  } else if (levelMenu) {
     String izbor = levelOpcije[mainMenu];
     if (izbor.equals("Natrag")) {
       levelMenu = false;
