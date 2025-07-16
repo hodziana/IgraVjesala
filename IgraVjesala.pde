@@ -1,4 +1,5 @@
 int mainMenu = 0;
+int hoverIndex = -1;
 String[] opcije = {"Singleplayer", "Multiplayer", "Postavke", "Izlaz"};
 String[] singleplayerOpcije = {"Leveli", "Natrag"};
 String[] levelOpcije = {"Level 1", "Level 2", "Level 3", "Natrag"};
@@ -24,38 +25,44 @@ void setup() {
 
 void draw() {
   background(200, 220, 255);
+  hoverIndex = -1;
+
   if (igraAktivna) {
     prikaziIgru();
   } else if (levelMenu) {
-    prikaziLevelOpcije();
+    prikaziOpcije(levelOpcije);
   } else if (singleplayerMenu) {
-    prikaziSingleplayerMeni();
+    prikaziOpcije(singleplayerOpcije);
   } else {
-    prikaziGlavniMeni();
+    prikaziOpcije(opcije);
   }
 }
 
-void prikaziGlavniMeni() {
-  for (int i = 0; i < opcije.length; i++) {
-    if (i == mainMenu) fill(255, 100, 100);
-    else fill(0);
-    text(opcije[i], width / 2, 100 + i * 50);
-  }
-}
+void prikaziOpcije(String[] izbornik) {
+  for (int i = 0; i < izbornik.length; i++) {
+    float x = width / 2;
+    float y = 100 + i * 50;
+    float w = textWidth(izbornik[i]);
+    float h = 32;
 
-void prikaziSingleplayerMeni() {
-  for (int i = 0; i < singleplayerOpcije.length; i++) {
-    if (i == mainMenu) fill(255, 100, 100);
-    else fill(0);
-    text(singleplayerOpcije[i], width / 2, 100 + i * 50);
+    boolean isHovered = mouseX > x - w/2 && mouseX < x + w/2 && mouseY > y - h/2 && mouseY < y + h/2;
+    if (isHovered) hoverIndex = i;
   }
-}
 
-void prikaziLevelOpcije() {
-  for (int i = 0; i < levelOpcije.length; i++) {
-    if (i == mainMenu) fill(255, 100, 100);
-    else fill(0);
-    text(levelOpcije[i], width / 2, 100 + i * 50);
+  if (hoverIndex != -1) {
+    mainMenu = hoverIndex;
+  }
+
+  for (int i = 0; i < izbornik.length; i++) {
+    float x = width / 2;
+    float y = 100 + i * 50;
+
+    if (i == mainMenu) {
+      fill(255, 100, 100);
+    } else {
+      fill(0);
+    }
+    text(izbornik[i], x, y);
   }
 }
 
@@ -64,8 +71,10 @@ void prikaziIgru() {
   text("Pokušaji: " + pokusaji, width / 2, 50);
 
   String prikazTekst = "";
+  boolean svePogodeno = true;
   for (char c : prikazano) {
     prikazTekst += c + " ";
+    if (c == '_') svePogodeno = false;
   }
   text(prikazTekst, width / 2, 150);
 
@@ -75,6 +84,13 @@ void prikaziIgru() {
   if (pokusaji <= 0) {
     fill(255, 0, 0);
     text("Izgubio si!", width / 2, height - 50);
+    delay(1500);
+    igraAktivna = false;
+    levelMenu = true;
+    mainMenu = 0;
+  } else if (svePogodeno) {
+    fill(0, 150, 0);
+    text("Pobijedio si!", width / 2, height - 50);
     delay(1500);
     igraAktivna = false;
     levelMenu = true;
@@ -95,61 +111,69 @@ void keyPressed() {
       singleplayerMenu = true;
       mainMenu = 0;
     }
-  } else if (levelMenu) {
-    if (keyCode == UP) {
-      mainMenu = (mainMenu - 1 + levelOpcije.length) % levelOpcije.length;
-    } else if (keyCode == DOWN) {
-      mainMenu = (mainMenu + 1) % levelOpcije.length;
-    } else if (keyCode == ENTER) {
-      String izbor = levelOpcije[mainMenu];
-      if (izbor.equals("Natrag")) {
-        levelMenu = false;
-        singleplayerMenu = true;
-        mainMenu = 0;
-      } else {
-        odabraniLevel = mainMenu + 1;
-        igraAktivna = true;
-        levelMenu = false;
-        mainMenu = 0;
-        inicijalizirajRijec();
-      }
-    }
-  } else if (singleplayerMenu) {
-    if (keyCode == UP) {
-      mainMenu = (mainMenu - 1 + singleplayerOpcije.length) % singleplayerOpcije.length;
-    } else if (keyCode == DOWN) {
-      mainMenu = (mainMenu + 1) % singleplayerOpcije.length;
-    } else if (keyCode == ENTER) {
-      String izbor = singleplayerOpcije[mainMenu];
-      if (izbor.equals("Natrag")) {
-        singleplayerMenu = false;
-        mainMenu = 0;
-      } else if (izbor.equals("Leveli")) {
-        levelMenu = true;
-        singleplayerMenu = false;
-        mainMenu = 0;
-      }
-    }
   } else {
+    String[] trenutniMeni = levelMenu ? levelOpcije : (singleplayerMenu ? singleplayerOpcije : opcije);
+    int duljina = trenutniMeni.length;
     if (keyCode == UP) {
-      mainMenu = (mainMenu - 1 + opcije.length) % opcije.length;
+      mainMenu = (mainMenu - 1 + duljina) % duljina;
     } else if (keyCode == DOWN) {
-      mainMenu = (mainMenu + 1) % opcije.length;
+      mainMenu = (mainMenu + 1) % duljina;
     } else if (keyCode == ENTER) {
-      odabirOpcije();
+      odaberiTrenutno();
     }
   }
 }
 
-void odabirOpcije() {
-  String izbor = opcije[mainMenu];
-  if (izbor.equals("Izlaz")) {
-    exit();
-  } else if (izbor.equals("Singleplayer")) {
-    singleplayerMenu = true;
-    mainMenu = 0;
+void mousePressed() {
+  String[] trenutniMeni = levelMenu ? levelOpcije : (singleplayerMenu ? singleplayerOpcije : opcije);
+  for (int i = 0; i < trenutniMeni.length; i++) {
+    float x = width / 2;
+    float y = 100 + i * 50;
+    float w = textWidth(trenutniMeni[i]);
+    float h = 32;
+    if (mouseX > x - w/2 && mouseX < x + w/2 && mouseY > y - h/2 && mouseY < y + h/2) {
+      mainMenu = i;
+      odaberiTrenutno();
+    }
+  }
+}
+
+void odaberiTrenutno() {
+  if (igraAktivna) return;
+
+  if (levelMenu) {
+    String izbor = levelOpcije[mainMenu];
+    if (izbor.equals("Natrag")) {
+      levelMenu = false;
+      singleplayerMenu = true;
+      mainMenu = 0;
+    } else {
+      odabraniLevel = mainMenu + 1;
+      igraAktivna = true;
+      levelMenu = false;
+      mainMenu = 0;
+      inicijalizirajRijec();
+    }
+  } else if (singleplayerMenu) {
+    String izbor = singleplayerOpcije[mainMenu];
+    if (izbor.equals("Natrag")) {
+      singleplayerMenu = false;
+      mainMenu = 0;
+    } else if (izbor.equals("Leveli")) {
+      levelMenu = true;
+      singleplayerMenu = false;
+      mainMenu = 0;
+    }
   } else {
-    println("Odabrana opcija: " + izbor);
+    String izbor = opcije[mainMenu];
+    if (izbor.equals("Izlaz")) {
+      exit();
+    } else if (izbor.equals("Singleplayer")) {
+      singleplayerMenu = true;
+      mainMenu = 0;
+    } else {
+      println("Odabrana opcija: " + izbor);
+    }
   }
 }
 
