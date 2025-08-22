@@ -81,7 +81,8 @@ void prikaziOpcije(String[] izbornik) {
 
 void prikaziIgru() {
   fill(0);
-  text("Pokušaji: " + pokusaji, width / 2, 50);
+  int promasaji = 6 - pokusaji;
+  crtajVjesala(promasaji);
 
   String prikazTekst = "";
   boolean svePogodeno = true;
@@ -89,10 +90,36 @@ void prikaziIgru() {
     prikazTekst += c + " ";
     if (c == '_') svePogodeno = false;
   }
-  text(prikazTekst, width / 2, 150);
+  
+  float margin = 40;
 
-  text("Unesena slova: " + unesenaSlova.toString(), width / 2, 250);
-  text("Level: " + odabraniLevel, width / 2, 320);
+  pushStyle();
+  textAlign(RIGHT, TOP);
+  text(prikazTekst, width - margin, 150);
+  popStyle();
+
+  pushStyle();
+  textAlign(RIGHT, TOP);
+
+  float yLabel = 230;
+  float boxW = min(420, width - 2*margin);
+  float xBox = width - margin - boxW;
+
+  fill(0);
+  text("Unesena slova:", width - margin, yLabel);
+
+  float lh = textAscent() + textDescent() + 6;
+  textLeading(lh);
+
+  String slovaStr = unesenaSlovaTekst();
+  text(slovaStr, xBox, yLabel + lh, boxW, height - (yLabel + lh) - margin);
+  popStyle();
+
+  pushStyle();
+  textAlign(RIGHT, TOP);
+  text("Level: " + odabraniLevel, width - margin, 320);
+  popStyle();
+
 
   if (pokusaji <= 0) {
     prikaziRezultat = true;
@@ -105,6 +132,16 @@ void prikaziIgru() {
     igraAktivna = false;
     mainMenu = -1;
   }
+}
+
+String unesenaSlovaTekst() {
+  if (unesenaSlova.isEmpty()) return "";
+  StringBuilder sb = new StringBuilder();
+  for (int i = 0; i < unesenaSlova.size(); i++) {
+    sb.append(unesenaSlova.get(i));
+    if (i < unesenaSlova.size() - 1) sb.append(' ');
+  }
+  return sb.toString();
 }
 
 void keyPressed() {
@@ -219,5 +256,44 @@ void provjeriUnos(char unos) {
   }
   if (!pogodak && pokusaji > 0) {
     pokusaji--;
+  }
+}
+
+void crtajVjesala(int promasaji) {
+  int x0 = 80;         
+  int y0 = 340;        
+  int visina = 250;    
+  int ruka = 80;       
+  int uze = 40;        
+
+  stroke(0);
+  strokeWeight(4);
+
+  line(x0, y0, x0 + 100, y0);         
+  line(x0 + 20, y0, x0 + 20, y0 - visina);  
+  line(x0 + 20, y0 - visina, x0 + 20 + ruka, y0 - visina); 
+  line(x0 + 20 + ruka, y0 - visina, x0 + 20 + ruka, y0 - visina + uze); 
+
+  int cx = x0 + 20 + ruka;          
+  int cy = y0 - visina + uze + 20; 
+
+  if (promasaji >= 1) {
+    noFill();
+    ellipse(cx, cy, 40, 40); 
+  }
+  if (promasaji >= 2) {
+    line(cx, cy + 20, cx, cy + 20 + 60); 
+  }
+  if (promasaji >= 3) {
+    line(cx, cy + 30, cx - 35, cy + 55); 
+  }
+  if (promasaji >= 4) {
+    line(cx, cy + 30, cx + 35, cy + 55); 
+  }
+  if (promasaji >= 5) {
+    line(cx, cy + 80, cx - 30, cy + 120); 
+  }
+  if (promasaji >= 6) {
+    line(cx, cy + 80, cx + 30, cy + 120); 
   }
 }
