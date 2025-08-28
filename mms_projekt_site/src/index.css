@@ -1,2 +1,44 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+.vjesala {
+    #glava, #torzo, #ruka_l, #ruka_d, #noga_l, #noga_d {
+        stroke: transparent;
+    }
+}
+
+.vjesala.g-1 {
+    #glava {
+        stroke: black;
+    }
+}
+
+.vjesala.g-2 {
+    #torzo {
+        stroke: black;
+    }
+}
+
+.vjesala.g-3 {
+    #ruka_l {
+        stroke: black;
+    }
+}
+
+.vjesala.g-4 {
+    #ruka_d {
+        stroke: black;
+    }
+}
+
+.vjesala.g-5 {
+    #noga_l {
+        stroke: black;
+    }
+}
+
+.vjesala.g-6 {
+    #noga_d {
+        stroke: black;
+    }
+}

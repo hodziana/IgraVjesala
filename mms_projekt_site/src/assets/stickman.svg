@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160" role="img">
+  <g fill="none" stroke="currentColor" strokeWidth="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 140H150"/>
+    <path d="M40 20V140"/>
+    <path d="M40 20H100"/>
+    <path d="M40 40L60 20"/>
+    <path d="M100 20V36"/>
+
+    <circle cx="100" cy="48" r="8" id="glava" />
+    <path d="M100 56V90" id="torzo" />
+    <path d="M100 62L80 74" id="ruka_l" />
+    <path d="M100 62L120 74" id="ruka_d" />
+    <path d="M100 90L90 120" id="noga_l" />
+    <path d="M100 90L110 120" id="noga_d" />
+  </g>
+</svg>

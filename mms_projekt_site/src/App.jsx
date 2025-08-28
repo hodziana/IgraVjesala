@@ -3,6 +3,7 @@ import Hero from './Hero'
 import Features from './Features'
 import Docs from './Docs'
 import Download from './Download'
+import Online from './Online'
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
       <Features></Features>
       <Docs></Docs>
       <Download></Download>
+      <Online></Online>
     </>
   )
 }
