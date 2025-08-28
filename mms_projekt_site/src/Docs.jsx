@@ -6,7 +6,7 @@ import mlijeko from "./assets/mlijeko.png";
 
 export default function Docs() {
   return (
-    <div class="relative isolate overflow-hidden bg-white px-6 py-24 sm:py-32 lg:overflow-visible lg:px-0">
+    <div class="relative isolate overflow-hidden bg-white px-6 py-24 sm:py-32 lg:overflow-visible lg:px-0" id="dokumentacija">
       <div class="absolute inset-0 -z-10 overflow-hidden">
         <svg
           aria-hidden="true"
