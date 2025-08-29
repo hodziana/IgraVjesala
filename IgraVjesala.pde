@@ -116,8 +116,7 @@ void draw() {
   if (darkTheme) {
     background(30, 30, 40);
     fill(230);
-  }
-  else {
+  } else {
     background(200, 220, 255);
     fill(0);
   }
@@ -125,7 +124,7 @@ void draw() {
   hoverIndex = -1;
 
   netUpdate();
-
+  
   if (prikaziRezultat) {
     prikaziRezultatEkran();
   } else if (igraAktivna) {
@@ -736,6 +735,7 @@ void odaberiTrenutno() {
       singleplayerMenu = false;
       mainMenu = 0;
     }
+  }
     
   else if (settingsMenu) {
     if (mainMenu == 0) {
@@ -754,7 +754,7 @@ void odaberiTrenutno() {
     }
   }
     
-  } else if (multiplayerMenu) {
+  else if (multiplayerMenu) {
     String izbor = multiplayerOpcije[mainMenu];
     if (izbor.equals("Natrag")) {
       multiplayerMenu = false;
@@ -770,6 +770,9 @@ void odaberiTrenutno() {
       exit();
     } else if (izbor.equals("Singleplayer")) {
       singleplayerMenu = true;
+      mainMenu = 0;
+    } else if (izbor.equals("Postavke")) {
+      settingsMenu = true;
       mainMenu = 0;
     } else if (izbor.equals("Multiplayer")) {
       multiplayerMenu = true;
