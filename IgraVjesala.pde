@@ -1,3 +1,4 @@
+import processing.sound.*;
 import processing.net.*;
 import java.util.*;
 
@@ -17,6 +18,7 @@ boolean levelMenu = false;
 boolean igraAktivna = false;
 boolean prikaziRezultat = false;
 boolean pobjeda = false;
+boolean settingsMenu = false;
 
 int odabraniLevel = 1;
 String rijec = "";
@@ -48,6 +50,17 @@ int scoreHost = 0;
 int scoreClient = 0;
 final int WIN_SCORE = 5;
 
+// ----- POSTAVKE -----
+
+boolean darkTheme = false;
+PFont currentFont;
+boolean musicOn = false;
+SoundFile bgMusic;  // iz biblioteke "Sound"
+
+String[] settingsOpcije = {"Tema: ", "Font: ", "Glazba: ", "Natrag"};
+int currentFontIndex = 0;
+String[] availableFonts = {"Arial", "Cambria", "Georgia"};
+
 
 //-----OSNOVNE FUNKCIJE-----
 
@@ -55,10 +68,60 @@ void setup() {
   size(600, 400);
   textAlign(CENTER, CENTER);
   textSize(32);
+  
+  currentFont = createFont(availableFonts[currentFontIndex], 32);
+  textFont(currentFont);
+
+  bgMusic = new SoundFile(this, "music.mp3"); 
+  bgMusic.loop();
+  bgMusic.amp(0); 
+}
+
+void prikaziPostavke() {
+  hoverIndex = -1; // reset
+
+  for (int i = 0; i < settingsOpcije.length; i++) {
+    float x = width / 2;
+    float y = 100 + i * 50;
+    float w = textWidth(settingsOpcije[i] + "XXX"); // rezerva za dulji tekst
+    float h = 32;
+
+    // provjera miša
+    boolean isHovered = mouseX > x - w / 2 && mouseX < x + w / 2 &&
+                        mouseY > y - h / 2 && mouseY < y + h / 2;
+    if (isHovered) hoverIndex = i;
+  }
+
+  if (hoverIndex != -1) {
+    mainMenu = hoverIndex;
+  }
+
+  for (int i = 0; i < settingsOpcije.length; i++) {
+    float x = width / 2;
+    float y = 100 + i * 50;
+
+    String textOpcija = settingsOpcije[i];
+    if (i == 0) textOpcija += darkTheme ? "Tamna" : "Svijetla";
+    if (i == 1) textOpcija += availableFonts[currentFontIndex];
+    if (i == 2) textOpcija += musicOn ? "ON" : "OFF";
+
+    if (i == mainMenu) fill(255, 100, 100); // crveno ako hover
+    else fill(darkTheme ? 230 : 0);
+
+    text(textOpcija, x, y);
+  }
 }
 
 void draw() {
-  background(200, 220, 255);
+  if (darkTheme) {
+    background(30, 30, 40);
+    fill(230);
+  }
+  else {
+    background(200, 220, 255);
+    fill(0);
+  }
+  
   hoverIndex = -1;
 
   netUpdate();
@@ -75,6 +138,8 @@ void draw() {
     prikaziOpcije(levelOpcije);
   } else if (singleplayerMenu) {
     prikaziOpcije(singleplayerOpcije);
+  } else if (settingsMenu){
+    prikaziPostavke();
   } else {
     prikaziOpcije(opcije);
   }
@@ -111,14 +176,15 @@ void prikaziOpcije(String[] izbornik) {
     if (i == mainMenu) {
       fill(255, 100, 100);
     } else {
-      fill(0);
+      fill(darkTheme ? 230 : 0);
     }
     text(izbornik[i], x, y);
   }
 }
 
 void prikaziIgru() {
-  fill(0);
+  if (darkTheme) fill(230);
+  else fill(0);
 
   //crtanje vješala
   int promasaji = 6 - pokusaji;
@@ -143,7 +209,7 @@ void prikaziIgru() {
   float yLabel = 230;
   float boxW = min(420, width - 2*margin);
   float xBox = width - margin - boxW;
-  fill(0);
+  fill(darkTheme ? 230 : 0);
   text("Unesena slova:", width - margin, yLabel);
   float lh = textAscent() + textDescent() + 6;
   textLeading(lh);
@@ -270,7 +336,7 @@ void crtajVjesala(int promasaji) {
   int ruka = 80;       
   int uze = 40;        
 
-  stroke(0);
+  stroke(darkTheme ? 230 : 0);
   strokeWeight(4);
 
   line(x0, y0, x0 + 100, y0);         
@@ -670,6 +736,24 @@ void odaberiTrenutno() {
       singleplayerMenu = false;
       mainMenu = 0;
     }
+    
+  else if (settingsMenu) {
+    if (mainMenu == 0) {
+      darkTheme = !darkTheme;
+    } else if (mainMenu == 1) {
+      currentFontIndex = (currentFontIndex + 1) % availableFonts.length;
+      currentFont = createFont(availableFonts[currentFontIndex], 32);
+      textFont(currentFont);
+    } else if (mainMenu == 2) {
+      musicOn = !musicOn;
+      if (musicOn) bgMusic.amp(0.5);
+      else bgMusic.amp(0);
+    } else if (mainMenu == 3) {
+      settingsMenu = false;
+      mainMenu = 0;
+    }
+  }
+    
   } else if (multiplayerMenu) {
     String izbor = multiplayerOpcije[mainMenu];
     if (izbor.equals("Natrag")) {
@@ -695,5 +779,3 @@ void odaberiTrenutno() {
     }
   }
 }
-
-
