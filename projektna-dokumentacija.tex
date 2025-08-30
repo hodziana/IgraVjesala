@@ -1,47 +1,37 @@
-# Uvod
+\documentclass{article}
+\usepackage{minted}
+\usepackage[croatian]{babel}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{enumitem}
 
-U ovom dokumentu opisan je kod napravljen za igru Vješala kao završni
-projekt kolegija Multimedijski sustavi.
 
-Kod u IgreVjesala.pde je podijeljen na 5 dijelova kako bi olakšali
-čitatelju snalaženje, a to su globalne varijable, osnovne funkcije,
-pomoćne funkcije, mrežne funkcije i funkcije obrada unosa. U ovoj
-dokumentaciji opis projekta je podijeljen kronološki po dodanim
-funkcionalnostima. Prvo smo postavili osnovnu verziju igre s njenim
-izbornikom i glavnom logikom igre za singleplayer opciju, a zatim dodali
-funkcionalnosti crtanja vješala kao vizualni prikaz gubljenja pokušaja u
-igri te implementirali multiplayer. Finalno, igri smo dodali opciju
-promjene postavki.
+\title{Dokumentacija igre Vješala}
+\author{Ana Hodžić, Iva Vuletić, Luka Žigolić, Mario Borna Mjertan}
+\date{rujan 2025.}
 
-# Funkcionalnosti igre
+\begin{document}
 
-## Singleplayer verzija igre
+\maketitle
 
-Igranje je podijeljeno u nekoliko glavnih stanja između kojih se igrač
-kreće: glavni izbornik, izbornik levela, sama igra, te ekran rezultata.
-Na taj način igra ima strukturu sličnu ostalim računalnim igrama - igrač
-započinje u meniju, odabire razinu, igra, dobije rezultat te na kraju
-odlučuje hoće li nastaviti dalje.
+\section{Uvod}
 
-U glavnom meniju se prikazuju osnovne opcije \"Singleplayer\",
-\"Multiplayer\", \"Postavke\" i \"Izlaz\". Klikom na opciju
-\"Singleplayer\", igrač dolazi u izbornik levela gdje bira težinu. Nakon
-što odabere level, igra prelazi u glavni dio - pogađanje skrivene
-riječi. Riječ je zadana unaprijed, a igrač pokušava odgonetnuti riječ
-pogađanjem jednog po jednog slova. Kod svake pogreške se postupno
-iscrtava figura čovjeka. Igra završava kada igrač ili pogodi cijelu
-riječ ili napravi previše pogrešaka.
+U ovom dokumentu opisan je kod napravljen za igru Vješala kao završni projekt kolegija Multimedijski sustavi. 
 
-Nakon završetka igre, pojavljuje se ekran sa ispisanom porukom o pobjedi
-ili gubitku, zelene ili crvene boje, ovisno o rezultatu. Ispod poruke se
-nalazi opcija \"Natrag na level menu\" na koju igrač može kliknuti kada
-je spreman nastaviti.
+Kod u IgreVjesala.pde je podijeljen na 5 dijelova kako bi olakšali čitatelju snalaženje, a to su globalne varijable, osnovne funkcije, pomoćne funkcije, mrežne funkcije i funkcije obrada unosa. U ovoj dokumentaciji opis projekta je podijeljen kronološki po dodanim funkcionalnostima. Prvo smo postavili osnovnu verziju igre s njenim izbornikom i glavnom logikom igre za singleplayer opciju, a zatim dodali funkcionalnosti crtanja vješala kao vizualni prikaz gubljenja pokušaja u igri te implementirali multiplayer. Finalno, igri smo dodali opciju promjene postavki.
 
-Za iscrtavanje izbornika koristili smo funkciju draw() koja ovisno o
-vrijdenosti True ili False varijable (koja određuje opciju) poziva
-pomoćne funkcije za prikaz opcija iz izbornika, rezultat,\...
 
-```java
+\section{Funkcionalnosti igre}
+
+\subsection{Singleplayer verzija igre}
+Igranje je podijeljeno u nekoliko glavnih stanja između kojih se igrač kreće: glavni izbornik, izbornik levela, sama igra, te ekran rezultata. Na taj način igra ima strukturu sličnu ostalim računalnim igrama - igrač započinje u meniju, odabire razinu, igra, dobije rezultat te na kraju odlučuje hoće li nastaviti dalje.
+
+U glavnom meniju se prikazuju osnovne opcije "Singleplayer", "Multiplayer", "Postavke" i "Izlaz". Klikom na opciju "Singleplayer", igrač dolazi u izbornik levela gdje bira težinu. Nakon što odabere level, igra prelazi u glavni dio - pogađanje skrivene riječi. Riječ je zadana unaprijed, a igrač pokušava odgonetnuti riječ pogađanjem jednog po jednog slova. Kod svake pogreške se postupno iscrtava figura čovjeka. Igra završava kada igrač ili pogodi cijelu riječ ili napravi previše pogrešaka. 
+
+Nakon završetka igre, pojavljuje se ekran sa ispisanom porukom o pobjedi ili gubitku, zelene ili crvene boje, ovisno o rezultatu. Ispod poruke se nalazi opcija "Natrag na level menu" na koju igrač može kliknuti kada je spreman nastaviti. 
+
+Za iscrtavanje izbornika koristili smo funkciju draw() koja ovisno o vrijdenosti True ili False varijable (koja određuje opciju) poziva pomoćne funkcije za prikaz opcija iz izbornika, rezultat,...
+
+\begin{minted}[frame=single,fontsize=\small]{java}
 void draw() {
   background(200, 220, 255);
   hoverIndex = -1;
@@ -64,15 +54,11 @@ void draw() {
     prikaziOpcije(opcije);
   }
 }
-```
+\end{minted}
 
-Funkcija prikaziOpcije(String\[\] izbornik) služi za upravljanje
-izbornikom opcija (npr. glavnog menija ili level menija). Za svaku
-stavku menija izračunava njezinu poziciju i ako se pokazivač miša nalazi
-unutar okvira teksta neke opcije, sprema indeks te opcije u varijablu
-hoverIndex. To znači da zna "koja opcija je trenutno pod mišem".
+Funkcija prikaziOpcije(String[] izbornik) služi za upravljanje izbornikom opcija (npr. glavnog menija ili level menija). Za svaku stavku menija izračunava njezinu poziciju i ako se pokazivač miša nalazi unutar okvira teksta neke opcije, sprema indeks te opcije u varijablu hoverIndex. To znači da zna “koja opcija je trenutno pod mišem”.
 
-```java
+\begin{minted}[frame=single,fontsize=\small]{java}
 void prikaziOpcije(String[] izbornik) {
   for (int i = 0; i < izbornik.length; i++) {
     float x = width / 2;
@@ -101,14 +87,11 @@ void prikaziOpcije(String[] izbornik) {
     text(izbornik[i], x, y);
   }
 }
-```
+\end{minted}
 
-Funkcija inicijalizirajRijec() postavlja novu riječ ovisno o odabranom
-levelu. Odabire slučajnu riječ iz unaprijed definirane liste, te
-pripremi niz znakova s podvlakama umjesto slova, izbriše prethodno
-unesena slova i resetira broj pokušaja na početnih 6.
+Funkcija inicijalizirajRijec() postavlja novu riječ ovisno o odabranom levelu. Odabire slučajnu riječ iz unaprijed definirane liste, te pripremi niz znakova s podvlakama umjesto slova, izbriše prethodno unesena slova i resetira broj pokušaja na početnih 6.
 
-```java
+\begin{minted}[frame=single,fontsize=\small]{java}
 void inicijalizirajRijec() {
   String[] trenutnaLista;
   if (odabraniLevel == 1) {
@@ -126,14 +109,11 @@ void inicijalizirajRijec() {
   unesenaSlova.clear();
   pokusaji = 6;
 }
-```
+\end{minted}
 
-Funkcija provjeriUnos(char unos) provjerava je li igrač pogodio slovo.
-Prolazi kroz cijelu skrivenu riječ i ako uneseno slovo postoji, otkriva
-ga na odgovarajućem mjestu. Ako se slovo ne nalazi u riječi, a igrač još
-ima pokušaja, smanjuje se broj preostalih pokušaja.
+Funkcija provjeriUnos(char unos) provjerava je li igrač pogodio slovo. Prolazi kroz cijelu skrivenu riječ i ako uneseno slovo postoji, otkriva ga na odgovarajućem mjestu. Ako se slovo ne nalazi u riječi, a igrač još ima pokušaja, smanjuje se broj preostalih pokušaja.
 
-```java
+\begin{minted}[frame=single,fontsize=\small]{java}
 void provjeriUnos(char unos) {
   boolean pogodak = false;
   for (int i = 0; i < rijec.length(); i++) {
@@ -146,18 +126,11 @@ void provjeriUnos(char unos) {
     pokusaji--;
   }
 }
-```
+\end{minted}
 
-Funkcija prikaziIgru() zadužena je za prikaz cijelog stanja igre dok
-igrač igra. Prvo crta vješala, zatim prikazuje dosad pogođena slova i
-crtice za neotkrivena slova, a ispod popis svih unesenih slova. Ako je
-igra u multiplayer modu, ispisuje trenutni rezultat i uloge igrača (tko
-postavlja riječ, a tko pogađa). Ako je igra singleplayer, prikazuje koji
-je level odabran. Na kraju se provjeravaju uvjeti završetka igre: ako su
-pokušaji potrošeni, igra završava porazom, a ako su slova pogođena, onda
-pobjedom.
+Funkcija prikaziIgru() zadužena je za prikaz cijelog stanja igre dok igrač igra. Prvo crta vješala, zatim prikazuje dosad pogođena slova i crtice za neotkrivena slova, a ispod popis svih unesenih slova. Ako je igra u multiplayer modu, ispisuje trenutni rezultat i uloge igrača (tko postavlja riječ, a tko pogađa). Ako je igra singleplayer, prikazuje koji je level odabran. Na kraju se provjeravaju uvjeti završetka igre: ako su pokušaji potrošeni, igra završava porazom, a ako su slova pogođena, onda pobjedom.
 
-```java
+\begin{minted}[frame=single,fontsize=\small]{java}
 void prikaziIgru() {
   fill(0);
 
@@ -226,12 +199,11 @@ void prikaziIgru() {
   }
   
 }
-```
+\end{minted}
 
-Funkcija prikaziRezultatEkran() služi za prikaz završnog ekrana igre na
-način opisan na početku odjeljka.
+Funkcija prikaziRezultatEkran() služi za prikaz završnog ekrana igre na način opisan na početku odjeljka. 
 
-```java
+\begin{minted}[frame=single,fontsize=\small]{java}
 void prikaziRezultatEkran() {
   fill(pobjeda ? color(0, 150, 0) : color(255, 0, 0));
   text(pobjeda ? "Pobijedio si!" : "Izgubio si!", width / 2, 60);
@@ -241,22 +213,24 @@ void prikaziRezultatEkran() {
     new String[]{"Natrag na level menu"};
   prikaziOpcije(rezultatOpcije);
 }
-```
+\end{minted}
 
-## Crtanje vješala
+\subsection{Crtanje vješala}
+Vješalo je nacrtano na lijevom dijelu 
+ekrana i sa svakom greškom igrača se 
+nacrta novi dio tijela. Igrač ima pravo 6 
+puta pogriješiti te kad se nacrtaju glava, 
+trup i udovi, igrač gubi igru.
 
-Vješalo je nacrtano na lijevom dijelu ekrana i sa svakom greškom igrača
-se nacrta novi dio tijela. Igrač ima pravo 6 puta pogriješiti te kad se
-nacrtaju glava, trup i udovi, igrač gubi igru.
+Postojećem kodu koji ima brojač za 
+pokušaje smo dodali varijablu promašaji 
+koja je brojač povezan sa crtanjem 
+vješala. Ovisno koliko je pokušaja 
+potrošeno, ovisi koliko udova crtamo.
 
-Postojećem kodu koji ima brojač za pokušaje smo dodali varijablu
-promašaji koja je brojač povezan sa crtanjem vješala. Ovisno koliko je
-pokušaja potrošeno, ovisi koliko udova crtamo.
+Glavna funkcija koja nam pomaže u crtanju vješala je crtajVjesala(promasaji).
 
-Glavna funkcija koja nam pomaže u crtanju vješala je
-crtajVjesala(promasaji).
-
-```java
+\begin{minted}[frame=single,fontsize=\small]{java}
 void crtajVjesala(int promasaji) {
   int x0 = 80;         
   int y0 = 340;        
@@ -295,28 +269,30 @@ void crtajVjesala(int promasaji) {
     line(cx, cy + 80, cx + 30, cy + 120); 
   }
 }
-```
-
+\end{minted}
 Tu funkciju pozivamo u prikaziIgru().
 
-## Multiplayer
 
-Igrač u multiplayer modu može odabrati želi li biti onaj koji postavlja
-riječ ili onaj koji ju pogađa. Ako onaj igrač koji pogađa riječ uspije
-pogoditi, onda dobiva bod i nastavlja biti onaj koji pogađa sve dok ne
-pogriješi. Kad igrač pogriješi, onaj koji je zadao riječ dobiva bod i
-onda je njegov red da pogađa. Igra se dok netko ne skupi 5 bodova.
-Multiplayer opcija je napravljena tako da se od ove verzije koda,
-IgraVjesala.pde, napravi kopija i pokrenu se obje u Processing-u. Dakle,
-igra je složena da se lokalno igra na jednom računalu. U jednom prozoru
-igrač upiše riječ, a u drugom pogađa. Na oba prozora je vidljivo stanje
-igre i trenutni bodovi oba igrača.
+\subsection{Multiplayer}
+Igrač u multiplayer modu može odabrati 
+želi li biti onaj koji postavlja riječ ili 
+onaj koji ju pogađa. Ako onaj igrač koji 
+pogađa riječ uspije pogoditi, onda dobiva 
+bod i nastavlja biti onaj koji pogađa sve 
+dok ne pogriješi. Kad igrač pogriješi, 
+onaj koji je zadao riječ dobiva bod i onda 
+je njegov red da pogađa. Igra se dok netko
+ne skupi 5 bodova. 
+Multiplayer opcija je napravljena tako da se od ove verzije koda, IgraVjesala.pde, napravi 
+kopija i pokrenu se obje u Processing-u. Dakle, igra je složena da se lokalno igra na jednom 
+računalu. 
+U jednom prozoru igrač upiše riječ, a u drugom pogađa. Na oba prozora je vidljivo stanje igre i 
+trenutni bodovi oba igrača. 
 
-Za multiplayer opciju morali smo uključiti i import processing.net.\*;
-koji nam omogućava mrežne igranje. Također, postavili smo port 50007 i
-lokalnu ip adresu 127.0.0.1, a za logiku su nam potrebne i zastavice.
+Za multiplayer opciju morali smo uključiti i import processing.net.*; koji nam omogućava mrežne 
+igranje. Također, postavili smo port 50007 i lokalnu ip adresu 127.0.0.1, a za logiku su nam potrebne i zastavice.
 
-```java
+\begin{minted}[frame=single,fontsize=\small]{java}
 Server srv;
 Client cli;
 final int PORT = 50007;
@@ -335,21 +311,18 @@ boolean setterIsHost = true; //host je uvijek postavljač riječi na početku
 int scoreHost = 0;
 int scoreClient = 0;
 final int WIN_SCORE = 5; //igra se do 5
-```
+\end{minted}
 
-**Multiplayer opcija igre započinje** s time da igrač bira, na izbornom
-meni-ju, hoće li postavljati riječ ili pogađati.
+\textbf{Multiplayer opcija igre započinje} s time da igrač bira, na izbornom meni-ju, hoće li postavljati riječ ili pogađati.
 
-```java
+\begin{minted}[frame=single,fontsize=\small]{java}
 String[] multiplayerOpcije = {"Postavi riječ", "Pogađaj", "Natrag"};
-```
+\end{minted}
 
-Ukoliko igrač odabere postavljanje, poziva se startHost koji pokreće
-server i postavlja zastavice na stranu host-a, a ako odabere pogađanje
-onda se poziva startJoinLocal() i time se spaja na server te postavlja
-zastavice na stranu klijenta.
 
-```java
+Ukoliko igrač odabere postavljanje, poziva se startHost koji pokreće server i postavlja zastavice na stranu host-a, a ako odabere pogađanje onda se poziva startJoinLocal() i time se spaja na server te postavlja zastavice na stranu klijenta.
+
+\begin{minted}[frame=single,fontsize=\small]{java}
 void startHost() {
   closeNetwork();
   try {
@@ -389,63 +362,56 @@ void startJoinLocal() {
   mainMenu = -1;    
   igraAktivna = false;
 }
-```
+\end{minted}
 
-Oblici **poruka** koji se pojavljuju u kodu su sljedeći:
+Oblici \textbf{poruka} koji se pojavljuju u kodu su sljedeći: 
+\begin{enumerate}[label=(\arabic*)] 
+  \item klijent -\textgreater server
 
-1.  klijent -\>server
+  GUESS\textbar SLOVO šalje klijent serveru kad je setter host
 
-    GUESSSLOVO šalje klijent serveru kad je setter host
+  SET\textbar RIJEČ šalje klijent kad je on setter
 
-    SETRIJEČ šalje klijent kad je on setter
+  \item server -\textgreater klijent
 
-2.  server -\>klijent
+  STATE\textbar\textless MASK\textgreater\textbar\textless POKUSAJI\textgreater\textbar\textless SLOVA\textgreater\textbar\textlessSCORE HOST-A\textgreater\textbar\textless SCORE KLIJENTA\textgreater\textbar\textless SETTER IS HOST \textgreater
 
-    STATE\<MASK\>\<POKUSAJI\>\<SLOVA\>HOST-A\>\<SCORE KLIJENTA\>\<SETTER
-    IS HOST \>
 
-**Glavna mrežna petlja** se nalazi u netUpdate() koja se poziva sa
-svakim pozivom funkcije draw().
+
+
+\end{enumerate}
+
+\textbf{Glavna mrežna petlja} se nalazi u netUpdate() koja se poziva sa svakim pozivom funkcije draw().
 
 Ta funkcija ima sljedeće radnje:
+\begin{enumerate}[label=(\arabic*)] 
+  \item Host prihvaća spajanje
+  
+  Host ili prihvaća spajanje klijenta ili ako je igra u tijeku, vraća stanje igre pozivom netSendState()
+  \item Host čita klijentovu poruku
 
-1.  Host prihvaća spajanje
+  Pozivom handleClientMsg() se obrađuje poruka koju je klijent poslao
+  \item Klijent čita poruku od host-a
 
-    Host ili prihvaća spajanje klijenta ili ako je igra u tijeku, vraća
-    stanje igre pozivom netSendState()
+  Pozivom handleServerMsg() se obrađuje poruka koju je host poslao
+  \item Prekid veze 
+  
+\end{enumerate}
 
-2.  Host čita klijentovu poruku
+Host \textbf{postavlja} riječ na ekranu koji je zadan funkcijom prikaziNetUnosRijeci() i time se riječ sprema u wordBuffer. Zatim se u funkciji keyPressed() provjerava zastavica za unesenu riječ te se poziva serverNewRoundSetWord(). Kada klijent postavlja riječ, poziva se handleClientMsg() u kojoj se također pozove serverNewRoundSetWord().
 
-    Pozivom handleClientMsg() se obrađuje poruka koju je klijent poslao
-
-3.  Klijent čita poruku od host-a
-
-    Pozivom handleServerMsg() se obrađuje poruka koju je host poslao
-
-4.  Prekid veze
-
-Host **postavlja** riječ na ekranu koji je zadan funkcijom
-prikaziNetUnosRijeci() i time se riječ sprema u wordBuffer. Zatim se u
-funkciji keyPressed() provjerava zastavica za unesenu riječ te se poziva
-serverNewRoundSetWord(). Kada klijent postavlja riječ, poziva se
-handleClientMsg() u kojoj se također pozove serverNewRoundSetWord().
-
-```java
+\begin{minted}[frame=single,fontsize=\small]{java}
 void serverNewRoundSetWord(String zadana) {
   inicijalizirajRijecZadana(zadana);
   igraAktivna = true;
   netEnterWord = false;
   netSendState();
 }
-```
+\end{minted}
 
-**Pogađa** onaj koji nije setter (guesserIsHost zastavica), a u
-keyPressed() funkciji se poziva serverGuess() koja provjerava unos i
-ukoliko su potrošeni svi pokušaji ili sva slova pogođena, poziva
-funkciju za kraj serverEndRound() ili netSendState() za slanje poruke
-koja sadržava sve info.
+\textbf{Pogađa} onaj koji nije setter (guesserIsHost zastavica), a u keyPressed() funkciji se poziva serverGuess() koja provjerava unos i ukoliko su potrošeni svi pokušaji ili sva slova pogođena, poziva funkciju za kraj serverEndRound() ili netSendState() za slanje poruke koja sadržava sve info. 
 
-```java
+\begin{minted}[frame=single,fontsize=\small]{java}
 //pogađanje
 void serverGuess(char unos) {
   if (unesenaSlova.contains(unos)) return;
@@ -510,23 +476,17 @@ void serverEndRound(boolean guesserWon) {
     // klijent postavlja
   }
 }
-```
+\end{minted}
 
-Osim toga, važno je još napomenuti da u funkciji keyPressed() ovisno o
-zastavicama netEnterWord i igraAktivna se događaju radnje unosa tajne
-riječi te pogađanje tj. radnje koje smo prethodno objasnili.
+Osim toga, važno je još napomenuti da u funkciji keyPressed() ovisno o zastavicama netEnterWord i igraAktivna se događaju radnje unosa tajne riječi te pogađanje tj. radnje koje smo prethodno objasnili.
 
-## Promjena postavki
+\subsection{Promjena postavki}
 
-Unutar postavki igrač može kontrolirati nekoliko aspekata. Može
-mijenjati između svijetlog i tamnog načina rada, paliti i gasiti glazbu
-te mijenjati font slova korištenih u igri. U nastavku je prikaz
-globalnih varijabli korištenih za rad unutar postavki. Koristimo
-jednostavne varijable kako bi pratili promjenu u postavkama. Također je
-važno napomenuti da koristimo biblioteku sound, a navedeni fontovi bi
-trebali biti standardno dostupni unutar Processing-a.
+Unutar postavki igrač može kontrolirati nekoliko aspekata. Može mijenjati između svijetlog i tamnog načina rada, paliti i gasiti glazbu te mijenjati font slova korištenih u igri.
+U nastavku je prikaz globalnih varijabli korištenih za rad unutar postavki. Koristimo jednostavne varijable kako bi pratili promjenu u postavkama. Također je važno napomenuti da koristimo biblioteku sound, a navedeni fontovi bi trebali biti standardno dostupni unutar Processing-a.
 
-```java
+
+\begin{minted}[frame=single,fontsize=\small]{java}
   boolean darkTheme = false;
   PFont currentFont;
   boolean musicOn = false;
@@ -535,14 +495,12 @@ trebali biti standardno dostupni unutar Processing-a.
   String[] settingsOpcije = {"Tema: ", "Font: ", "Glazba: ", "Natrag"};
   int currentFontIndex = 0;
   String[] availableFonts = {"Arial", "Cambria", "Georgia"};
-```
+\end{minted}
 
-U početku se nalazimo u svijetloj temi, glazba je isključena i početni
-font nam je Arial. Unutar postavki zadržavamo funkcionalnosti koje smo
-imali i unutar glavnog menija (kao što je npr. promjena boje pri
-hover-anju miša iznad postavke)
+U početku se nalazimo u svijetloj temi, glazba je isključena i početni font nam je Arial. 
+Unutar postavki zadržavamo funkcionalnosti koje smo imali i unutar glavnog menija (kao što je npr. promjena boje pri hover-anju miša iznad postavke)
 
-```java
+\begin{minted}[frame=single,fontsize=\small]{java}    
   void setup() {
     size(600, 400);
     textAlign(CENTER, CENTER);
@@ -590,20 +548,13 @@ hover-anju miša iznad postavke)
       text(textOpcija, x, y);
     }
   }
-```
+\end{minted}
 
-Unutar mousePressed() funkcije imamo glavni dio postavki, ovdje
-reagiramo na sve moguće klikove i prema njima radimo potrebne promjene
-unutar postavki. U slučaju promjene fonta pomičemo se za jedno mjesto u
-desno unutar naše liste fontova, pazeći pri tome da ostanemo unutar
-postojećih indexa. Glazbu jednostavno palimo ili gasimo korištenjem
-funkcije za glasnoću (ovisno o prijašnjem stanju), a promjena načina
-rada u tamni ili svijetli način je implementirana kroz sve draw()
-funkcije i funkcije crtanja/prikaza. Stoga nam je ovdje bitno samo
-negirati našu globalnu varijablu darkTheme kako bi se prebacili u novi
-način rada.
+Unutar mousePressed() funkcije imamo glavni dio postavki, ovdje reagiramo na sve moguće klikove i prema njima radimo potrebne promjene unutar postavki.
+U slučaju promjene fonta pomičemo se za jedno mjesto u desno unutar naše liste fontova, pazeći pri tome da ostanemo unutar postojećih indexa. Glazbu jednostavno palimo ili gasimo korištenjem funkcije za glasnoću (ovisno o prijašnjem stanju), a promjena načina rada u tamni ili svijetli način je implementirana kroz sve draw() funkcije i funkcije crtanja/prikaza.
+Stoga nam je ovdje bitno samo negirati našu globalnu varijablu darkTheme kako bi se prebacili u novi način rada.
 
-```java
+\begin{minted}[frame=single,fontsize=\small]{java} 
   else if (settingsMenu) {
     if (mainMenu == 0) {
       darkTheme = !darkTheme;
@@ -620,4 +571,6 @@ način rada.
       mainMenu = 0;
     }
   }
-```
+\end{minted}
+
+\end{document}
