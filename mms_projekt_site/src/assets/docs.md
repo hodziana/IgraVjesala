@@ -17,6 +17,232 @@ promjene postavki.
 
 ## Singleplayer verzija igre
 
+Igranje je podijeljeno u nekoliko glavnih stanja između kojih se igrač
+kreće: glavni izbornik, izbornik levela, sama igra, te ekran rezultata.
+Na taj način igra ima strukturu sličnu ostalim računalnim igrama - igrač
+započinje u meniju, odabire razinu, igra, dobije rezultat te na kraju
+odlučuje hoće li nastaviti dalje.
+
+U glavnom meniju se prikazuju osnovne opcije \"Singleplayer\",
+\"Multiplayer\", \"Postavke\" i \"Izlaz\". Klikom na opciju
+\"Singleplayer\", igrač dolazi u izbornik levela gdje bira težinu. Nakon
+što odabere level, igra prelazi u glavni dio - pogađanje skrivene
+riječi. Riječ je zadana unaprijed, a igrač pokušava odgonetnuti riječ
+pogađanjem jednog po jednog slova. Kod svake pogreške se postupno
+iscrtava figura čovjeka. Igra završava kada igrač ili pogodi cijelu
+riječ ili napravi previše pogrešaka.
+
+Nakon završetka igre, pojavljuje se ekran sa ispisanom porukom o pobjedi
+ili gubitku, zelene ili crvene boje, ovisno o rezultatu. Ispod poruke se
+nalazi opcija \"Natrag na level menu\" na koju igrač može kliknuti kada
+je spreman nastaviti.
+
+Za iscrtavanje izbornika koristili smo funkciju draw() koja ovisno o
+vrijdenosti True ili False varijable (koja određuje opciju) poziva
+pomoćne funkcije za prikaz opcija iz izbornika, rezultat,\...
+
+```java
+void draw() {
+  background(200, 220, 255);
+  hoverIndex = -1;
+
+  netUpdate();
+
+  if (prikaziRezultat) {
+    prikaziRezultatEkran();
+  } else if (igraAktivna) {
+    prikaziIgru();
+  } else if (netEnterWord) {
+  prikaziNetUnosRijeci(); 
+  } else if (multiplayerMenu) {
+    prikaziOpcije(multiplayerOpcije);
+  } else if (levelMenu) {
+    prikaziOpcije(levelOpcije);
+  } else if (singleplayerMenu) {
+    prikaziOpcije(singleplayerOpcije);
+  } else {
+    prikaziOpcije(opcije);
+  }
+}
+```
+
+Funkcija prikaziOpcije(String\[\] izbornik) služi za upravljanje
+izbornikom opcija (npr. glavnog menija ili level menija). Za svaku
+stavku menija izračunava njezinu poziciju i ako se pokazivač miša nalazi
+unutar okvira teksta neke opcije, sprema indeks te opcije u varijablu
+hoverIndex. To znači da zna "koja opcija je trenutno pod mišem".
+
+```java
+void prikaziOpcije(String[] izbornik) {
+  for (int i = 0; i < izbornik.length; i++) {
+    float x = width / 2;
+    float y = 100 + i * 50;
+    float w = textWidth(izbornik[i]);
+    float h = 32;
+
+    boolean isHovered = mouseX > x - w / 2 && mouseX < x + w / 2 &&
+                        mouseY > y - h / 2 && mouseY < y + h / 2;
+    if (isHovered) hoverIndex = i;
+  }
+
+  if (hoverIndex != -1) {
+    mainMenu = hoverIndex;
+  }
+
+  for (int i = 0; i < izbornik.length; i++) {
+    float x = width / 2;
+    float y = 100 + i * 50;
+
+    if (i == mainMenu) {
+      fill(255, 100, 100);
+    } else {
+      fill(0);
+    }
+    text(izbornik[i], x, y);
+  }
+}
+```
+
+Funkcija inicijalizirajRijec() postavlja novu riječ ovisno o odabranom
+levelu. Odabire slučajnu riječ iz unaprijed definirane liste, te
+pripremi niz znakova s podvlakama umjesto slova, izbriše prethodno
+unesena slova i resetira broj pokušaja na početnih 6.
+
+```java
+void inicijalizirajRijec() {
+  String[] trenutnaLista;
+  if (odabraniLevel == 1) {
+    trenutnaLista = rijeciLevel1;
+  } else if (odabraniLevel == 2) {
+    trenutnaLista = rijeciLevel2;
+  } else {
+    trenutnaLista = rijeciLevel3;
+  }
+  rijec = trenutnaLista[(int) random(trenutnaLista.length)];
+  prikazano = new char[rijec.length()];
+  for (int i = 0; i < prikazano.length; i++) {
+    prikazano[i] = '_';
+  }
+  unesenaSlova.clear();
+  pokusaji = 6;
+}
+```
+
+Funkcija provjeriUnos(char unos) provjerava je li igrač pogodio slovo.
+Prolazi kroz cijelu skrivenu riječ i ako uneseno slovo postoji, otkriva
+ga na odgovarajućem mjestu. Ako se slovo ne nalazi u riječi, a igrač još
+ima pokušaja, smanjuje se broj preostalih pokušaja.
+
+```java
+void provjeriUnos(char unos) {
+  boolean pogodak = false;
+  for (int i = 0; i < rijec.length(); i++) {
+    if (rijec.charAt(i) == unos) {
+      prikazano[i] = unos;
+      pogodak = true;
+    }
+  }
+  if (!pogodak && pokusaji > 0) {
+    pokusaji--;
+  }
+}
+```
+
+Funkcija prikaziIgru() zadužena je za prikaz cijelog stanja igre dok
+igrač igra. Prvo crta vješala, zatim prikazuje dosad pogođena slova i
+crtice za neotkrivena slova, a ispod popis svih unesenih slova. Ako je
+igra u multiplayer modu, ispisuje trenutni rezultat i uloge igrača (tko
+postavlja riječ, a tko pogađa). Ako je igra singleplayer, prikazuje koji
+je level odabran. Na kraju se provjeravaju uvjeti završetka igre: ako su
+pokušaji potrošeni, igra završava porazom, a ako su slova pogođena, onda
+pobjedom.
+
+```java
+void prikaziIgru() {
+  fill(0);
+
+  //crtanje vješala
+  int promasaji = 6 - pokusaji;
+  crtajVjesala(promasaji);
+
+  //pogođena slova i _
+  String prikazTekst = "";
+  boolean svePogodeno = true;
+  for (char c : prikazano) {
+    prikazTekst += c + " ";
+    if (c == '_') svePogodeno = false;
+  }
+  
+  float margin = 40;
+  pushStyle();
+  textAlign(RIGHT, TOP);
+  text(prikazTekst, width - margin, 150);
+  popStyle();
+
+  pushStyle();
+  textAlign(RIGHT, TOP);
+  float yLabel = 230;
+  float boxW = min(420, width - 2*margin);
+  float xBox = width - margin - boxW;
+  fill(0);
+  text("Unesena slova:", width - margin, yLabel);
+  float lh = textAscent() + textDescent() + 6;
+  textLeading(lh);
+  String slovaStr = unesenaSlovaTekst();
+  text(slovaStr, xBox, yLabel + lh, boxW, height - (yLabel + lh) - margin);
+  popStyle();
+
+  if(netHost || netJoin){
+    //multiplayer
+    pushStyle();
+    textAlign(RIGHT, TOP);
+    textSize(20);
+    String uloge = "Postavlja: " + (setterIsHost ? "HOST" : "CLIENT") + 
+        " | Pogađa: " + (setterIsHost ? "CLIENT" : "HOST");
+    text("Bodovi HOST " + scoreHost + " - " + scoreClient + " CLIENT | " 
+        + uloge, width - margin, 20);
+    text(uloge, width - margin, 50);
+    popStyle();
+  } else {
+    //singleplayer
+    pushStyle();
+    textAlign(RIGHT, TOP);
+    text("Level: " + odabraniLevel, width - margin, 320);
+    popStyle();
+  }
+
+  if(!(netHost || netJoin)) {
+    if (pokusaji <= 0) {
+      prikaziRezultat = true;
+      pobjeda = false;
+      igraAktivna = false;
+      mainMenu = -1;
+    } else if (svePogodeno) {
+      prikaziRezultat = true;
+      pobjeda = true;
+      igraAktivna = false;
+      mainMenu = -1;
+    }
+  }
+  
+}
+```
+
+Funkcija prikaziRezultatEkran() služi za prikaz završnog ekrana igre na
+način opisan na početku odjeljka.
+
+```java
+void prikaziRezultatEkran() {
+  fill(pobjeda ? color(0, 150, 0) : color(255, 0, 0));
+  text(pobjeda ? "Pobijedio si!" : "Izgubio si!", width / 2, 60);
+
+  String[] rezultatOpcije = (netHost || netJoin) ? 
+    new String[]{"Natrag na multiplayer menu"} : 
+    new String[]{"Natrag na level menu"};
+  prikaziOpcije(rezultatOpcije);
+}
+```
+
 ## Crtanje vješala
 
 Vješalo je nacrtano na lijevom dijelu ekrana i sa svakom greškom igrača
@@ -291,3 +517,107 @@ zastavicama netEnterWord i igraAktivna se događaju radnje unosa tajne
 riječi te pogađanje tj. radnje koje smo prethodno objasnili.
 
 ## Promjena postavki
+
+Unutar postavki igrač može kontrolirati nekoliko aspekata. Može
+mijenjati između svijetlog i tamnog načina rada, paliti i gasiti glazbu
+te mijenjati font slova korištenih u igri. U nastavku je prikaz
+globalnih varijabli korištenih za rad unutar postavki. Koristimo
+jednostavne varijable kako bi pratili promjenu u postavkama. Također je
+važno napomenuti da koristimo biblioteku sound, a navedeni fontovi bi
+trebali biti standardno dostupni unutar Processing-a.
+
+```java
+  boolean darkTheme = false;
+  PFont currentFont;
+  boolean musicOn = false;
+  SoundFile bgMusic;  // iz biblioteke "Sound"
+
+  String[] settingsOpcije = {"Tema: ", "Font: ", "Glazba: ", "Natrag"};
+  int currentFontIndex = 0;
+  String[] availableFonts = {"Arial", "Cambria", "Georgia"};
+```
+
+U početku se nalazimo u svijetloj temi, glazba je isključena i početni
+font nam je Arial. Unutar postavki zadržavamo funkcionalnosti koje smo
+imali i unutar glavnog menija (kao što je npr. promjena boje pri
+hover-anju miša iznad postavke)
+
+```java
+  void setup() {
+    size(600, 400);
+    textAlign(CENTER, CENTER);
+    textSize(32);
+    
+    currentFont = createFont(availableFonts[currentFontIndex], 32);
+    textFont(currentFont);
+
+    bgMusic = new SoundFile(this, "music.mp3"); 
+    bgMusic.loop();
+    bgMusic.amp(0); 
+  }
+
+  void prikaziPostavke() {
+    hoverIndex = -1; // reset
+
+    for (int i = 0; i < settingsOpcije.length; i++) {
+      float x = width / 2;
+      float y = 100 + i * 50;
+      float w = textWidth(settingsOpcije[i] + "XXX"); // rezerva za dulji tekst
+      float h = 32;
+
+      // provjera miša
+      boolean isHovered = mouseX > x - w / 2 && mouseX < x + w / 2 &&
+                          mouseY > y - h / 2 && mouseY < y + h / 2;
+      if (isHovered) hoverIndex = i;
+    }
+
+    if (hoverIndex != -1) {
+      mainMenu = hoverIndex;
+    }
+
+    for (int i = 0; i < settingsOpcije.length; i++) {
+      float x = width / 2;
+      float y = 100 + i * 50;
+
+      String textOpcija = settingsOpcije[i];
+      if (i == 0) textOpcija += darkTheme ? "Tamna" : "Svijetla";
+      if (i == 1) textOpcija += availableFonts[currentFontIndex];
+      if (i == 2) textOpcija += musicOn ? "ON" : "OFF";
+
+      if (i == mainMenu) fill(255, 100, 100); 
+      else fill(darkTheme ? 230 : 0);
+
+      text(textOpcija, x, y);
+    }
+  }
+```
+
+Unutar mousePressed() funkcije imamo glavni dio postavki, ovdje
+reagiramo na sve moguće klikove i prema njima radimo potrebne promjene
+unutar postavki. U slučaju promjene fonta pomičemo se za jedno mjesto u
+desno unutar naše liste fontova, pazeći pri tome da ostanemo unutar
+postojećih indexa. Glazbu jednostavno palimo ili gasimo korištenjem
+funkcije za glasnoću (ovisno o prijašnjem stanju), a promjena načina
+rada u tamni ili svijetli način je implementirana kroz sve draw()
+funkcije i funkcije crtanja/prikaza. Stoga nam je ovdje bitno samo
+negirati našu globalnu varijablu darkTheme kako bi se prebacili u novi
+način rada.
+
+```java
+  else if (settingsMenu) {
+    if (mainMenu == 0) {
+      darkTheme = !darkTheme;
+    } else if (mainMenu == 1) {
+      currentFontIndex = (currentFontIndex + 1) % availableFonts.length;
+      currentFont = createFont(availableFonts[currentFontIndex], 32);
+      textFont(currentFont);
+    } else if (mainMenu == 2) {
+      musicOn = !musicOn;
+      if (musicOn) bgMusic.amp(0.5);
+      else bgMusic.amp(0);
+    } else if (mainMenu == 3) {
+      settingsMenu = false;
+      mainMenu = 0;
+    }
+  }
+```
